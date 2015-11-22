@@ -22,7 +22,7 @@ go build
 
 If you just want to run this tool:
 ```
-go install github.com/janlay/text-builder
+go get github.com/janlay/text-builder
 ```
 
 Run `text-builder -help` to see usage.
@@ -33,7 +33,7 @@ Basic usage is quite simple:
 ```
 text-builder
 ```
-which use STDIN as input and output to STDOUT.
+which uses STDIN as input and outputs to STDOUT.
 
 For most cases, you may want to:
 ```
