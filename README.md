@@ -8,6 +8,7 @@ This tool is in early stage development but stable enough to run larger benchmar
 missing features will be added as needed, pull requests are welcome ;)
 
 ## Layout of Index and Other files
+See `./examples` for more details.
 Check this [gist](https://gist.github.com/janlay/b57476c72a93b7e622a6) to understand how Text Builder builds file from several sources.
 
 ## Building

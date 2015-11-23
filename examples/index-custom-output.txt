@@ -1,0 +1,13 @@
+#output new.txt
+# place #output in first line of the index file to override output file setting in args
+# so you can run `text-builder -index index-custom-output.txt` without -output
+line 1
+line 2
+#include 2.txt
+-----
+#include
+https://gist.githubusercontent.com/janlay/b57476c72a93b7e622a6/raw/general.conf
+
+line 3
+line 4
+

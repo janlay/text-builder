@@ -1,0 +1,10 @@
+# Run `text-builder -index index.txt -output out.txt` to build
+line 1
+line 2
+#include 2.txt
+-----
+#include https://gist.githubusercontent.com/janlay/b57476c72a93b7e622a6/raw/general.txt
+
+line 3
+line 4
+
