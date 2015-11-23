@@ -19,6 +19,10 @@ const version = "0.1"
 var indexFile, outputFile string
 var helpOnly, verboseMode, hasOutputSetting bool
 var totalSource uint
+var spPattern = regexp.MustCompile(`\s+`)
+var outputPattern = regexp.MustCompile(`#output\s+\S+`)
+var includePattern = regexp.MustCompile(`#include\s+\S+`)
+
 
 func init() {
 	// defines flags
@@ -88,15 +92,14 @@ func parseFile(path string) []string {
 	}
 
 	scanner := bufio.NewScanner(reader)
-	regexp := regexp.MustCompile(`\s+`)
 
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		if !hasOutputSetting {
 			hasOutputSetting = true
-			if strings.HasPrefix(line, "#output") {
-				out := strings.TrimSpace(regexp.Split(line, 2)[1])
+			if outputPattern.MatchString(line) {
+				out := strings.TrimSpace(spPattern.Split(line, 2)[1])
 				if len(out) > 0 {
 					info("Specified output file is", out)
 					outputFile = out
@@ -105,8 +108,8 @@ func parseFile(path string) []string {
 			}
 		}
 
-		if strings.HasPrefix(line, "#include") {
-			nextFilename := strings.TrimSpace(regexp.Split(line, 2)[1])
+		if includePattern.MatchString(line) {
+			nextFilename := strings.TrimSpace(spPattern.Split(line, 2)[1])
 			if len(nextFilename) > 0 {
 				if !isRemoteURL(nextFilename) && !remoteMode && !filepath.IsAbs(nextFilename) {
 					nextFilename = filepath.Join(filepath.Dir(path), nextFilename)
