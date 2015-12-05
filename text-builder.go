@@ -17,14 +17,14 @@ import (
 const version = "0.1"
 
 var indexFile, outputFile string
-var helpOnly, verboseMode, hasOutputSetting bool
+var verboseMode, hasOutputSetting bool
 var totalSource uint
 var spPattern = regexp.MustCompile(`\s+`)
 var outputPattern = regexp.MustCompile(`#output\s+\S+`)
 var includePattern = regexp.MustCompile(`#include\s+\S+`)
 
-
 func init() {
+	var helpOnly bool
 	// defines flags
 	flag.StringVar(&indexFile, "index", "", "path of the index file, defaults to stdin")
 	flag.StringVar(&outputFile, "output", "", "path of the output file, defaults to stdout")
@@ -101,6 +101,7 @@ func parseFile(path string) []string {
 			if outputPattern.MatchString(line) {
 				out := strings.TrimSpace(spPattern.Split(line, 2)[1])
 				if len(out) > 0 {
+					out = resolvePath(path, out)
 					info("Specified output file is", out)
 					outputFile = out
 				}
@@ -111,9 +112,7 @@ func parseFile(path string) []string {
 		if includePattern.MatchString(line) {
 			nextFilename := strings.TrimSpace(spPattern.Split(line, 2)[1])
 			if len(nextFilename) > 0 {
-				if !isRemoteURL(nextFilename) && !remoteMode && !filepath.IsAbs(nextFilename) {
-					nextFilename = filepath.Join(filepath.Dir(path), nextFilename)
-				}
+				nextFilename = resolvePath(path, nextFilename)
 				info("including content", nextFilename)
 				lines = append(lines, parseFile(nextFilename)...)
 			}
@@ -122,7 +121,7 @@ func parseFile(path string) []string {
 		}
 	}
 
-	err := scanner.Err();
+	err := scanner.Err()
 	check(err)
 
 	return lines
@@ -136,6 +135,13 @@ func check(e error) {
 
 func isRemoteURL(url string) bool {
 	return strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://")
+}
+
+func resolvePath(basePath string, relativePath string) string {
+	if isRemoteURL(basePath) || isRemoteURL(relativePath) || filepath.IsAbs(relativePath) {
+		return relativePath
+	}
+	return filepath.Join(filepath.Dir(basePath), relativePath)
 }
 
 func info(v ...interface{}) {
