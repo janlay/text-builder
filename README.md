@@ -1,4 +1,4 @@
-# Text Builder v0.1
+# Text Builder v0.2
 
 Text Builder is a small utility which combines local and remote files into single text file.
 
@@ -39,6 +39,12 @@ For most cases, you may want to:
 ```
 text-builder -index /path/to/index -output /path/to/output
 ```
+
+Build the file and skip some #include directives:
+```
+text-builder -index /path/to/index -output /path/to/output -skip=a.txt,b.txt
+```
+
 ## Layout of Index and Other files
 See `./examples` for more details.
 Check this [gist](https://gist.github.com/janlay/b57476c72a93b7e622a6) to understand how Text Builder builds file from several sources.

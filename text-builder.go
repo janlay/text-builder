@@ -14,9 +14,10 @@ import (
 	"time"
 )
 
-const version = "0.1"
+const version = "0.2"
 
 var indexFile, outputFile string
+var skipFiles []string
 var verboseMode, hasOutputSetting bool
 var totalSource uint
 var spPattern = regexp.MustCompile(`\s+`)
@@ -26,8 +27,10 @@ var includePattern = regexp.MustCompile(`#include\s+\S+`)
 func init() {
 	var helpOnly bool
 	// defines flags
+	var skipFileList string
 	flag.StringVar(&indexFile, "index", "", "path of the index file, defaults to stdin")
 	flag.StringVar(&outputFile, "output", "", "path of the output file, defaults to stdout")
+	flag.StringVar(&skipFileList, "skip", "", "list of filename should be skipped, defaults to nothing")
 	flag.BoolVar(&verboseMode, "verbose", false, "show more info while running")
 	flag.BoolVar(&helpOnly, "help", false, "show this help")
 
@@ -38,6 +41,9 @@ func init() {
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
+
+	skipFileList = strings.TrimSpace(skipFileList)
+	skipFiles = strings.Split(skipFileList, ",")
 
 	log.SetOutput(os.Stdout)
 	log.SetFlags(0)
@@ -114,7 +120,9 @@ func parseFile(path string) []string {
 			if len(nextFilename) > 0 {
 				nextFilename = resolvePath(path, nextFilename)
 				info("including content", nextFilename)
-				lines = append(lines, parseFile(nextFilename)...)
+				if !contains(skipFiles, filepath.Base(nextFilename)) {
+					lines = append(lines, parseFile(nextFilename)...)
+				}
 			}
 		} else {
 			lines = append(lines, line)
@@ -131,6 +139,15 @@ func check(e error) {
 	if e != nil {
 		log.Fatalln(e)
 	}
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 func isRemoteURL(url string) bool {
